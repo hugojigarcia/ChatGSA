@@ -1,4 +1,3 @@
-import torch
 import os
 from dotenv import load_dotenv
 import openai
@@ -14,8 +13,6 @@ from langchain.memory import ConversationBufferMemory
 
 class RAG:
     def __init__(self, vectordb_path):
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
-
         self.embeddings = HuggingFaceEmbeddings()
         self.vectordb_path = vectordb_path
         self.vectordb = Chroma(persist_directory=self.vectordb_path, embedding_function=self.embeddings)

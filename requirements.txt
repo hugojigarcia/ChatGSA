@@ -1,7 +1,5 @@
-transformers==4.38.1
 langchain==0.1.8
 chromadb==0.4.23
-# ctransformers==0.2.27 COMPROBAR SI HACE FALTA
 sentence-transformers==2.3.1 #COMPROBAR SI HACE FALTA--> parece que si hacia falta
 lark==1.1.9
 # Los siguientes son para utilizar la API de OpenAI
@@ -10,3 +8,5 @@ tiktoken==0.6.0
 langchain-openai==0.0.7
 # Para mantener memoria y devolver documentos usados
 param==2.0.2
+
+flask==3.0.2
