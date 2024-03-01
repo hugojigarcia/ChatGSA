@@ -19,9 +19,9 @@ class RAG:
 
         # self.embeddings = HuggingFaceEmbeddings()
         self.embeddings = OpenAIEmbeddings()
-        # self.vectordb_path = vectordb_path
-        # self.vectordb = Chroma(persist_directory=self.vectordb_path, embedding_function=self.embeddings)
-        # print(self.vectordb._collection.count())
+        self.vectordb_path = vectordb_path
+        self.vectordb = Chroma(persist_directory=self.vectordb_path, embedding_function=self.embeddings)
+        print(self.vectordb._collection.count())
 
         self.llm = ChatOpenAI(model='gpt-3.5-turbo', temperature=0)
 
