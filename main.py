@@ -37,7 +37,11 @@ def get_mock():
 import os
 @app.route('/')
 def home():
-    return "HOLA: " + str(os.getcwd())
+
+    current_directory = os.getcwd()
+    directories = [name for name in os.listdir(current_directory) if os.path.isdir(os.path.join(current_directory, name))]
+    directories_string = ', '.join(directories)
+    return "HOLA: " + directories_string
     return render_template('index.html')
 
 
