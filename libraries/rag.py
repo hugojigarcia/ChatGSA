@@ -23,9 +23,9 @@ class RAG:
         # self.vectordb = Chroma(persist_directory=self.vectordb_path, embedding_function=self.embeddings)
         # print(self.vectordb._collection.count())
 
-        # self.llm = ChatOpenAI(model='gpt-3.5-turbo', temperature=0)
+        self.llm = ChatOpenAI(model='gpt-3.5-turbo', temperature=0)
 
-        # self.conversational_retrieval_chain = self.__get_conversational_retrieval_chain()
+        self.conversational_retrieval_chain = self.__get_conversational_retrieval_chain()
     
 
     def __get_conversational_retrieval_chain(self):
