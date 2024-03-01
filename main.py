@@ -5,13 +5,15 @@ app = Flask(__name__)
 
 # ===================================
 # PROVIONAL
-input_path = "vector_db"
-rag = RAG(vectordb_path=input_path)
+
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
 @app.route('/')
 def hello_world():
     text = "Hello, World! BD count:"
-    text += rag.vectordb._collection.count()
+    text += str(os.getenv('OPENAI_API_KEY'))
     return text
 
 if __name__ == '__main__':
