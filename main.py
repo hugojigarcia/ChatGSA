@@ -49,17 +49,17 @@ def ask():
         chat_history[i] = (el[0], el[1])
 
     # MOCK
-    # answer, sources = get_mock()
+    answer, sources = get_mock()
 
     # NO MOCK
-    result = rag.ask(question, chat_history)
-    answer = result["answer"]
-    sources = []
-    for el in result["source_documents"]:
-        source = {}
-        source["source"] = el.metadata['source']
-        source["text"] = el.page_content
-        sources.append(source)
+    # result = rag.ask(question, chat_history)
+    # answer = result["answer"]
+    # sources = []
+    # for el in result["source_documents"]:
+    #     source = {}
+    #     source["source"] = el.metadata['source']
+    #     source["text"] = el.page_content
+    #     sources.append(source)
 
     chat_history.extend([(question, answer)])
     response = {
