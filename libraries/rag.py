@@ -2,7 +2,8 @@ import os
 from dotenv import load_dotenv
 import openai
 from langchain_community.vectorstores import Chroma
-from langchain_community.embeddings import HuggingFaceEmbeddings
+# from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_openai import OpenAIEmbeddings
 from langchain_openai import ChatOpenAI
 from langchain.chains.query_constructor.base import AttributeInfo
 from langchain.prompts import PromptTemplate
@@ -13,7 +14,8 @@ from langchain.memory import ConversationBufferMemory
 
 class RAG:
     def __init__(self, vectordb_path):
-        self.embeddings = HuggingFaceEmbeddings()
+        # self.embeddings = HuggingFaceEmbeddings()
+        self.embeddings = OpenAIEmbeddings()
         self.vectordb_path = vectordb_path
         self.vectordb = Chroma(persist_directory=self.vectordb_path, embedding_function=self.embeddings)
         print(self.vectordb._collection.count())

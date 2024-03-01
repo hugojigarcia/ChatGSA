@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-# from libraries.rag import RAG
+from libraries.rag import RAG
 import json
 
 app = Flask(__name__)
@@ -8,8 +8,8 @@ app = Flask(__name__)
 
 # ===================================
 # PROVIONAL
-from langchain_community.embeddings import HuggingFaceEmbeddings
-embeddings = HuggingFaceEmbeddings()
+input_path = "vector_db"
+rag = RAG(vectordb_path=input_path)
 
 def get_mock():
     answer = "El Kraal es el conjunto de responsables del Grupo encargados de liderar y gestionar las actividades educativas y formativas de la organización, y su elección y admisión se realiza mediante consenso del mismo."
@@ -49,19 +49,19 @@ def ask():
         chat_history[i] = (el[0], el[1])
 
     # MOCK
-    answer, sources = get_mock()
+    # answer, sources = get_mock()
 
     # NO MOCK
-    # result = rag.ask(question, chat_history)
-    # answer = result["answer"]
-    chat_history.extend([(question, answer)])
-    # sources = []
-    # for el in result["source_documents"]:
-    #     source = {}
-    #     source["source"] = el.metadata['source']
-    #     source["text"] = el.page_content
-    #     sources.append(source)
+    result = rag.ask(question, chat_history)
+    answer = result["answer"]
+    sources = []
+    for el in result["source_documents"]:
+        source = {}
+        source["source"] = el.metadata['source']
+        source["text"] = el.page_content
+        sources.append(source)
 
+    chat_history.extend([(question, answer)])
     response = {
         "answer": answer,
         "sources": sources,
