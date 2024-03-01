@@ -8,13 +8,13 @@ app = Flask(__name__)
 
 # ===================================
 # PROVIONAL
-from langchain_community.vectorstores import Chroma
-from langchain_community.embeddings import HuggingFaceEmbeddings
-
-input_path = "vector_db"
-embeddings = HuggingFaceEmbeddings()
-# vectordb = Chroma(persist_directory=input_path, embedding_function=embeddings)
-# rag = RAG(vectordb_path=input_path)
+# from dotenv import load_dotenv
+# import os
+# import openai
+# from langchain_openai import ChatOpenAI
+# load_dotenv()
+# openai.api_key = os.getenv('OPENAI_API_KEY')
+# llm = ChatOpenAI(model='gpt-3.5-turbo', temperature=0)
 
 def get_mock():
     answer = "El Kraal es el conjunto de responsables del Grupo encargados de liderar y gestionar las actividades educativas y formativas de la organización, y su elección y admisión se realiza mediante consenso del mismo."
