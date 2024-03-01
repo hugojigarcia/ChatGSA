@@ -1,26 +1,15 @@
 from flask import Flask, render_template, request, jsonify
 from libraries.rag import RAG
 import json
-from dotenv import load_dotenv
-import os
 
 app = Flask(__name__)
 
 
 
 # ===================================
-# TASK
-
-load_dotenv()
-llm_model_name = os.getenv('LLM_MODEL_NAME')
-embeddings_model_name = os.getenv('EMBEDDINGS_MODEL_NAME')
-PROJECT_ID = os.getenv('PROJECT_ID')
-REGION = os.getenv('REGION')
-BUCKET_NAME = os.getenv('BUCKET_NAME')
-INDEX_ID = os.getenv('INDEX_ID')
-ENDPOINT_ID = os.getenv('ENDPOINT_ID')
-
-rag = RAG(PROJECT_ID, REGION, BUCKET_NAME, llm_model_name, embeddings_model_name, INDEX_ID, ENDPOINT_ID)
+# PROVIONAL
+input_path = "vector_db"
+rag = RAG(vectordb_path=input_path)
 
 def get_mock():
     answer = "El Kraal es el conjunto de responsables del Grupo encargados de liderar y gestionar las actividades educativas y formativas de la organización, y su elección y admisión se realiza mediante consenso del mismo."
@@ -45,7 +34,7 @@ def get_mock():
     return answer, sources
 # ===================================
 
-import os
+
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -64,6 +53,7 @@ def ask():
     # NO MOCK
     result = rag.ask(question, chat_history)
     answer = result["answer"]
+    chat_history.extend([(question, answer)])
     sources = []
     for el in result["source_documents"]:
         source = {}
@@ -71,7 +61,6 @@ def ask():
         source["text"] = el.page_content
         sources.append(source)
 
-    chat_history.extend([(question, answer)])
     response = {
         "answer": answer,
         "sources": sources,

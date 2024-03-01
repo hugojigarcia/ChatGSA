@@ -1,15 +1,33 @@
+import torch
+import os
+from dotenv import load_dotenv
+# import openai
+# from langchain_openai import ChatOpenAI
+from langchain_community.vectorstores import Chroma
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain.chains.query_constructor.base import AttributeInfo
 from langchain.prompts import PromptTemplate
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
 from langchain_google_vertexai.embeddings import VertexAIEmbeddings
 import vertexai
 from langchain_google_vertexai import VertexAI
+from langchain.retrievers.self_query.base import SelfQueryRetriever
+from langchain.retrievers import ContextualCompressionRetriever
+from langchain.retrievers.document_compressors import LLMChainExtractor
 from langchain_community.vectorstores import MatchingEngine
-
 
 
 class RAG:
     def __init__(self, project_id, region, bucket_name, llm_model_name, embeddings_model_name, index_id, endpoint_id): # vectordb_path
+        # self.device = "cuda" if torch.cuda.is_available() else "cpu"
+
+        # self.embeddings = HuggingFaceEmbeddings()
+        # self.vectordb_path = vectordb_path
+        # self.vectordb = Chroma(persist_directory=self.vectordb_path, embedding_function=self.embeddings)
+        # openai.api_key = os.getenv('OPENAI_API_KEY')
+        # self.llm = ChatOpenAI(model='gpt-3.5-turbo', temperature=0)
+
         self.embeddings_model_name = embeddings_model_name
         self.embeddings = VertexAIEmbeddings(model_name=self.embeddings_model_name)
         self.project_id = project_id
@@ -32,7 +50,6 @@ class RAG:
         self.llm = VertexAI(model=self.llm_model_name)
 
         self.conversational_retrieval_chain = self.__get_conversational_retrieval_chain()
-    
     
 
     def __get_conversational_retrieval_chain(self):
@@ -71,7 +88,6 @@ class RAG:
             verbose=False
         )
     
-    
     def __get_chain_prompt(self):
         template = """
         Utiliza los siguientes elementos de contexto (delimitados por <ctx></ctx>) y el historial de chat (delimitado por <hs></hs>) para responder a la pregunta (delimitada por <qst></qst>). Genera una única respuesta. Si no sabes la respuesta, di simplemente que no la sabes, no intentes inventarte una respuesta:
@@ -94,6 +110,19 @@ class RAG:
             template=template,
         )
     
+    def __get_metadata_info(self):
+        document_content_description = "Episodes of the podcast" # Describe el contenido general de los metadatos.
+        metadata_field_info = [ # Se definen cada uno de los atributos de los metadatos.
+            AttributeInfo(
+                name="filename",
+                # description="The podcast episode that must follow this structure: 'epXXX_whisper', where XXX is an integer that represents the episode number. Some examples of podcasts episodes are: 'ep001_whisper', 'ep002_whisper', 'ep003_whisper', 'ep047_whisper', 'ep112_whisper'.",
+                description="It's a number that represents the podcast episode. It's a 3 digit number, some podcasts episodes examples are '001', '007', '056', '123'. Keep in mind that some podcasts episodes follow this structure: XXX_Z, where XXX is the 3 digit number, and Z is a capital A or a capital B. Some examples are '003_A', '032_B' and '421_A'",
+                type="string",
+            ),
+        ]
+        return document_content_description, metadata_field_info
+    
+
     def ask(self, question, chat_history):
         return self.conversational_retrieval_chain.invoke({"question": question, "chat_history": chat_history})
         

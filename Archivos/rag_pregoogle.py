@@ -1,60 +1,38 @@
+import os
+from dotenv import load_dotenv
+import openai
+from langchain_community.vectorstores import Chroma
+# from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_openai import OpenAIEmbeddings
+from langchain_openai import ChatOpenAI
+from langchain.chains.query_constructor.base import AttributeInfo
 from langchain.prompts import PromptTemplate
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferMemory
-from langchain_google_vertexai.embeddings import VertexAIEmbeddings
-import vertexai
-from langchain_google_vertexai import VertexAI
-from langchain_community.vectorstores import MatchingEngine
 
 
 
 class RAG:
-    def __init__(self, project_id, region, bucket_name, llm_model_name, embeddings_model_name, index_id, endpoint_id): # vectordb_path
-        self.embeddings_model_name = embeddings_model_name
-        self.embeddings = VertexAIEmbeddings(model_name=self.embeddings_model_name)
-        self.project_id = project_id
-        self.region = region
-        self.bucket_name = bucket_name
-        self.llm_model_name = llm_model_name
-        self.index_id = index_id
-        self.endpoint_id = endpoint_id
+    def __init__(self, vectordb_path):
+        load_dotenv()
+        openai.api_key = os.getenv('OPENAI_API_KEY')
 
+        # self.embeddings = HuggingFaceEmbeddings()
+        self.embeddings = OpenAIEmbeddings()
+        self.vectordb_path = vectordb_path
+        self.vectordb = Chroma(persist_directory=self.vectordb_path, embedding_function=self.embeddings)
+        print(self.vectordb._collection.count())
 
-        vertexai.init(project=self.project_id, location=self.region)
-        self.vectordb = MatchingEngine.from_components(
-            project_id=self.project_id,
-            region=self.region,
-            gcs_bucket_name=self.bucket_name,
-            embedding=self.embeddings,
-            index_id=self.index_id,
-            endpoint_id=self.endpoint_id,
-        )
-        self.llm = VertexAI(model=self.llm_model_name)
+        self.llm = ChatOpenAI(model='gpt-3.5-turbo', temperature=0)
 
         self.conversational_retrieval_chain = self.__get_conversational_retrieval_chain()
     
-    
 
     def __get_conversational_retrieval_chain(self):
-        # document_content_description, metadata_field_info = self.__get_metadata_info()
-        # self_query_retriever = SelfQueryRetriever.from_llm( # LLM Aided retrieval: usa un modelo LLM para hacer la query, ya que usa filtros de metadatos (estos metadatos hay que definirlos en metadata_field_info y document_content_description). Lo que hace el modelo es adaptar la question, para generar una query que filtra por los metadatos según lo que se pregunte.
-        #     llm=self.llm,
-        #     vectorstore=self.vectordb,
-        #     document_contents=document_content_description,
-        #     metadata_field_info=metadata_field_info,
-        #     enable_limit=True, # esto permite que el modelo LLM pueda limitar el número de documentos que se extraen, por ejemplo preguntando "Dime 2 libros de X autor" y que solo se extraigan 2 documentos
-        #     verbose=True
-        # )
         return ConversationalRetrievalChain.from_llm( # Lo que hace ConversationalRetrievalChain que lo diferencia de RetrievalQA.from_chain_type, es que añade un paso extra: coge el historial de chat y la pregunta que se realiza, y lo condensa en una única pregunta para pasásrsela al retriever. Es decir, si en el historial se ha hablado de NVIDIA, y se le pregunta por "esa empresa", lo que hace es juntar esa pregunta, con el historial, y generar la pregunta "la empresa NVIDIA", y le pasa esto último al retriever.
             # 0. Juntar el historial de chat y la pregunta en una única pregunta -> Esto siempre se hace con un modelo LLM
             # 1. Retriever: de qué manera se extraen los documentos de la vectordb para responder a la question Más retrievers: https://python.langchain.com/docs/modules/data_connection/retrievers/ 
-            retriever=self.vectordb.as_retriever(),
-            # retriever=self.vectordb.as_retriever(search_type="mmr", search_kwargs={"fetch_k": 5, "k": 3}), # MMR: usando similaridad, pero se queda con los k que más información diversa aportan de los fetch_k extraídos
-            # retriever=self_query_retriever,
-            # retriever=ContextualCompressionRetriever( # Lo que hace es, de cada documento extraído, extraer sólo la información relevante para responder a la pregunta. Se extraen con base_retriever (puede ser cualquiera) y luego se comprimen usando base_compressor (un LLM)
-            #     base_compressor=LLMChainExtractor.from_llm(self.llm), # CUIDADO: esto requiere hacer una llamada al LLM por cada documento extraído, por lo que si se usa la API de OpenAI, se consumen créditos, y si se usa un modelo local, es muy lento (y peor).
-            #     base_retriever=self_query_retriever # Aquí se podría usar cualquiera de los otros retrievers (similarity, mmr, SelfQueryRetriever, etc.)
-            # ),
+            retriever=self.vectordb.as_retriever(search_type="mmr", search_kwargs={"fetch_k": 5, "k": 3}), # MMR: usando similaridad, pero se queda con los k que más información diversa aportan de los fetch_k extraídos
             # 2. Juntar los documentos extraídos y responder a la pregunta -> Esto siempre se hace con un modelo LLM
             llm=self.llm,
             chain_type="stuff", # Es el tipo por defecto, que simplemente junta todos los docuemntos extraídos en uno solo (uno a continuación del otro, sin más procesamiento). Pros: Solo hace una llamada al LLM. Contras: si hay muchos documentos, puede que no quepan todos en la ventana de contexto del LLM.
@@ -71,10 +49,10 @@ class RAG:
             verbose=False
         )
     
-    
     def __get_chain_prompt(self):
         template = """
-        Utiliza los siguientes elementos de contexto (delimitados por <ctx></ctx>) y el historial de chat (delimitado por <hs></hs>) para responder a la pregunta (delimitada por <qst></qst>). Genera una única respuesta. Si no sabes la respuesta, di simplemente que no la sabes, no intentes inventarte una respuesta:
+        Utiliza los siguientes elementos de contexto (delimitados por <ctx></ctx>) y el historial de chat (delimitado por <hs></hs>) para responder a la pregunta (delimitada por <qst></qst>). Genera una única respuesta. Si no sabes la respuesta, di simplemente que no la sabes, no intentes inventarte una respuesta. Utiliza tres frases como máximo. La respuesta debe ser lo más concisa posible.:
+        ------
         <ctx>
         {context}
         </ctx>

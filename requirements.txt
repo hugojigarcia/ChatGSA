@@ -1,9 +1,14 @@
-langchain==0.1.8
-chromadb==0.4.23
-sentence-transformers==2.3.1
-openai==1.12.0
-langchain-openai==0.0.7
-langchain-community==0.0.24
-param==2.0.2
+# OTHERS
+# chromadb==0.4.23
+# sentence-transformers==2.3.1
+# openai==1.12.0
+# langchain-openai==0.0.7
+# langchain-community==0.0.24
+# param==2.0.2
 
+
+# DEPLOY
+langchain==0.1.8
+langchain_google_vertexai==0.1.0
 flask==3.0.2
+python-dotenv==1.0.1
