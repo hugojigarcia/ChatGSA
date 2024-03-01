@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, jsonify
 # from libraries.rag import RAG
-from libraries.mock import MOCK
 import json
 
 app = Flask(__name__)
@@ -9,9 +8,13 @@ app = Flask(__name__)
 
 # ===================================
 # PROVIONAL
-# input_path = "vector_db"
+from langchain_community.vectorstores import Chroma
+from langchain_community.embeddings import HuggingFaceEmbeddings
+
+input_path = "vector_db"
+embeddings = HuggingFaceEmbeddings()
+vectordb = Chroma(persist_directory=input_path, embedding_function=embeddings)
 # rag = RAG(vectordb_path=input_path)
-mock_obj = MOCK()
 
 def get_mock():
     answer = "El Kraal es el conjunto de responsables del Grupo encargados de liderar y gestionar las actividades educativas y formativas de la organización, y su elección y admisión se realiza mediante consenso del mismo."
@@ -39,8 +42,8 @@ def get_mock():
 
 @app.route('/')
 def home():
-    return mock_obj.get_mock()
-    # return render_template('index.html')
+    return "HOLA: " + str(vectordb._collection.count())
+    return render_template('index.html')
 
 
 @app.route('/ask', methods=['POST'])
