@@ -1,10 +1,18 @@
 from flask import Flask, render_template, request, jsonify
+# from libraries.rag import RAG
+from libraries.mock import MOCK
 import json
 
 app = Flask(__name__)
 
+
+
 # ===================================
 # PROVIONAL
+# input_path = "vector_db"
+# rag = RAG(vectordb_path=input_path)
+mock_obj = MOCK()
+
 def get_mock():
     answer = "El Kraal es el conjunto de responsables del Grupo encargados de liderar y gestionar las actividades educativas y formativas de la organización, y su elección y admisión se realiza mediante consenso del mismo."
     sources = [
@@ -28,13 +36,12 @@ def get_mock():
     return answer, sources
 # ===================================
 
+
 @app.route('/')
-def hello_world():
-    return render_template('index.html')
+def home():
+    return mock_obj.get_mock()
+    # return render_template('index.html')
 
-
-if __name__ == '__main__':
-    app.run(debug=True)
 
 @app.route('/ask', methods=['POST'])
 def ask():
@@ -64,3 +71,7 @@ def ask():
     }
 
     return jsonify(response)
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
