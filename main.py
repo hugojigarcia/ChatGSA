@@ -34,10 +34,10 @@ def get_mock():
     return answer, sources
 # ===================================
 
-
+import os
 @app.route('/')
 def home():
-    # return "HOLA: " + str(vectordb._collection.count())
+    return "HOLA: " + str(os.getcwd())
     return render_template('index.html')
 
 

@@ -18,7 +18,7 @@ class RAG:
         openai.api_key = os.getenv('OPENAI_API_KEY')
 
         # self.embeddings = HuggingFaceEmbeddings()
-        # self.embeddings = OpenAIEmbeddings()
+        self.embeddings = OpenAIEmbeddings()
         # self.vectordb_path = vectordb_path
         # self.vectordb = Chroma(persist_directory=self.vectordb_path, embedding_function=self.embeddings)
         # print(self.vectordb._collection.count())
