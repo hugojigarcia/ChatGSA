@@ -1,0 +1,11 @@
+runtime: python310
+api_version: 1
+threadsafe: true
+
+handlers:
+- url: /.*
+  script: app.app  
+
+libraries:
+- name: flask
+  version: 3.0.2
