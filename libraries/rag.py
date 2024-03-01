@@ -14,14 +14,15 @@ from langchain.memory import ConversationBufferMemory
 
 class RAG:
     def __init__(self, vectordb_path):
+        load_dotenv()
+        openai.api_key = os.getenv('OPENAI_API_KEY')
+        
         # self.embeddings = HuggingFaceEmbeddings()
         self.embeddings = OpenAIEmbeddings()
         self.vectordb_path = vectordb_path
         self.vectordb = Chroma(persist_directory=self.vectordb_path, embedding_function=self.embeddings)
         print(self.vectordb._collection.count())
 
-        load_dotenv()
-        openai.api_key = os.getenv('OPENAI_API_KEY')
         self.llm = ChatOpenAI(model='gpt-3.5-turbo', temperature=0)
 
         self.conversational_retrieval_chain = self.__get_conversational_retrieval_chain()
