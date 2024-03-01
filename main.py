@@ -13,7 +13,7 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 
 input_path = "vector_db"
 embeddings = HuggingFaceEmbeddings()
-vectordb = Chroma(persist_directory=input_path, embedding_function=embeddings)
+# vectordb = Chroma(persist_directory=input_path, embedding_function=embeddings)
 # rag = RAG(vectordb_path=input_path)
 
 def get_mock():
@@ -42,7 +42,7 @@ def get_mock():
 
 @app.route('/')
 def home():
-    return "HOLA: " + str(vectordb._collection.count())
+    # return "HOLA: " + str(vectordb._collection.count())
     return render_template('index.html')
 
 
