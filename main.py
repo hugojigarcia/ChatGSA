@@ -10,7 +10,9 @@ rag = RAG(vectordb_path=input_path)
 
 @app.route('/')
 def hello_world():
-    return 'Hello, World!'
+    text = "Hello, World! BD count:"
+    text += rag.vectordb._collection.count()
+    return text
 
 if __name__ == '__main__':
     app.run(debug=True)
