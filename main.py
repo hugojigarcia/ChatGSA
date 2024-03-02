@@ -67,7 +67,7 @@ def ask():
     sources = []
     for el in result["source_documents"]:
         source = {}
-        source["source"] = el.metadata['source']
+        # source["source"] = el.metadata['source'] # TODO no se guarda los metadatos
         source["text"] = el.page_content
         sources.append(source)
 
