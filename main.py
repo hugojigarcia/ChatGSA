@@ -47,34 +47,34 @@ def create_app():
     def home():
         return render_template('index.html')
 
-    @app.route('/ask', methods=['POST'])
-    def ask():
-        question = request.form['question']
-        chat_history = json.loads(request.form['chat_history'])
-        for i, el in enumerate(chat_history):
-            chat_history[i] = (el[0], el[1])
+    # @app.route('/ask', methods=['POST'])
+    # def ask():
+    #     question = request.form['question']
+    #     chat_history = json.loads(request.form['chat_history'])
+    #     for i, el in enumerate(chat_history):
+    #         chat_history[i] = (el[0], el[1])
 
-        # MOCK
-        # answer, sources = get_mock()
+    #     # MOCK
+    #     # answer, sources = get_mock()
 
-        # NO MOCK
-        result = rag.ask(question, chat_history)
-        answer = result["answer"]
-        sources = []
-        for el in result["source_documents"]:
-            source = {}
-            # source["source"] = el.metadata['source'] # TODO no se guarda los metadatos
-            source["text"] = el.page_content
-            sources.append(source)
+    #     # NO MOCK
+    #     result = rag.ask(question, chat_history)
+    #     answer = result["answer"]
+    #     sources = []
+    #     for el in result["source_documents"]:
+    #         source = {}
+    #         # source["source"] = el.metadata['source'] # TODO no se guarda los metadatos
+    #         source["text"] = el.page_content
+    #         sources.append(source)
 
-        chat_history.extend([(question, answer)])
-        response = {
-            "answer": answer,
-            "sources": sources,
-            "chat_history": chat_history
-        }
+    #     chat_history.extend([(question, answer)])
+    #     response = {
+    #         "answer": answer,
+    #         "sources": sources,
+    #         "chat_history": chat_history
+    #     }
 
-        return jsonify(response)
+    #     return jsonify(response)
 
     return app
 
