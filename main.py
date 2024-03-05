@@ -68,7 +68,7 @@ def ask():
     for el in result["source_documents"]:
         source = {}
         # source["source"] = el.metadata['source'] # TODO no se guarda los metadatos
-        source["text"] = el.page_content
+        source["text"] = el.page_content.replace("```", "").strip()
         sources.append(source)
 
     chat_history.extend([(question, answer)])

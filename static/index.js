@@ -28,7 +28,7 @@ function askQuestion() {
                 responseHtml += "<p>Fuentes:</p>";
                 sources.forEach(function (source) {
                     responseHtml += "<div class='source'>";
-                            responseHtml += "<p class='source-source'>Fuente: " + source.source + "</p>";
+                            // responseHtml += "<p class='source-source'>Fuente: " + source.source + "</p>";
                             responseHtml += "<p class='source-text'>Texto: " + source.text + "</p>";
                             responseHtml += "</div>";
                 });
